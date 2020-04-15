@@ -1,0 +1,50 @@
+---
+title: "Intro"
+author: "Paola"
+date: "15/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Midex Model
+Documento introduttivo sulll'utilizzo di modelli multilivello per migliorare una previsione
+
+
+## Inizializzazione
+
+*Inizializza l'ambiente cancellando tutto 
+```{r}
+rm(list=ls())
+```
+
+*imposta le directory del progetto sostituendo il tuo path
+```{r}
+mydir <- "C:/Users/.../mixedmodel/"
+```
+
+*imposta le sottocartelle per i file ricevuti e prodotti. __I file originali vanno messi nella cartella _datain_ di mixedmodel.__
+```{r}
+mydirdi <- paste0(mydir,"datain/")
+mydirdo <- paste0(mydir,"dataout/")
+```
+
+*setta la cartella di lavoro
+```{r eval=FALSE}
+setwd(mydir)
+```
+
+## Apertura file
+
+*carica i file
+```{r eval=FALSE}
+spp <- read.csv(paste0(mydirdi,'SPEET_POP_PLUS.csv'))
+degree <- read.csv(paste0(mydirdi,'SPEET_DEGREE_INFORMATION.csv'))
+```
+
+*visualizza le prime righe
+```{r eval=FALSE}
+table(degree)`
+```
