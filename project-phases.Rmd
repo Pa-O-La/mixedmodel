@@ -1,0 +1,53 @@
+---
+title: "Project phases"
+author: "Paola"
+date: "17/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Data Integration
+
+
+```{r cars}
+summary(cars)
+```
+
+## 2. Data Aggregation
+
+exams_aggr
+
+```{r eval=FALSE}
+plot(pressure)
+```
+
+
+## 3. Feature Selection
+
+### Intuition based
+Keep the variable... 
+
+### Math based
+score
+
+## 4. Missing Value
+
+
+## 5. Oulier
+optional?
+
+## 6. Data Partition
+* Remove the data for prediction
+* Split the remaining data in training and test
+
+
+## 7. Mixed MOdel
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+
