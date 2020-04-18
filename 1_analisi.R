@@ -1,9 +1,7 @@
 #esplorazione dati
 
-mydir <- "C:/Users/10114518/Documents/dm/prj-dropout/mixedmodel/"
-mydirdi <- paste0(mydir,"datain/")
-mydirdo <- paste0(mydir,"dataout/")
-setwd(mydir)
+mydirdi <- paste0(getwd(),"/data/datain/")
+mydirdo <- paste0(getwd(),"/data/dataout/")
 
 #carriere 1 livello
 carreers <- read.csv(paste0(mydirdi,'SPEET_POP_PLUS.csv'))
