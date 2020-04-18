@@ -1,0 +1,51 @@
+---
+title: "Features Explanation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### SPEET_DEGREE_INFORMATION.csv
+Degree courses description
+
+#### Features
+- CDS_POLI_EDU_FLD: Faculty type (I: Engeneering, A: Architecture, D: Design)
+- CDS_TIPO_CD: First (1) or second (2) degree level
+- NUMBERATTEMPTSTOENROLESUBJECT: ?
+- NUMBERATTEMPTSTOBEEVALUATEDONEYEAR: ?
+- SCOREIMPROVEMENT: ?
+
+### SPEET_EXAMS.csv
+?
+
+### SPEET_EXAMS_NOT_PASSED.csv
+Description of not passed exams for each career
+
+#### Features
+- ATTFRM_DN: Name of the exam
+- ESA_SOST_NUM: Number of times the student has tried the exam. If the number is 0 it means the exam has been covalidated from another course/university?
+- ESA_SUP_NUM: Should be 0 for all the students?!?!?
+- STUD_ACQSZ_CFU_VOTO: ?
+- STUD_ACQSZ_CFU_LODE: ?
+- STUD_ACQSZ_CFU_MOD_FLTP: Exam status as at the end of the student carrer (S: soprannumero, E: effettivo, C: convalidato) ?????
+- STUD_ATTFRM_POSIZ: previous exam status ????
+- STUD_ACQSZ_OK: ?
+- STUD_ATTFRM_FRQ_FLST: ?
+- ESA_VERB_NUM: why is greater than 1?
+- STUD_ATTFRM_CLAS_ID: ?
+
+### SPEET_EXAMS_NOT_PASSED.csv
+Description of passed exams for each career
+
+#### Features
+- STUD_FREQ_AA: what 0 values mean? why are there exams before 2010?
+- ESA_SUP_NUM: why some exams have 0 here?
+- STUD_ACQSZ_CFU_LODE: why are there some null values and some N? There's a difference?
+
+### SPEET_EXAMS_PASSED_AGGR.csv
+Description of exams information for each career in aggregated form
+
+### SPEET_EXAMS_STATS.csv
+Description of exams statistics. I am not sure if they are reliable
