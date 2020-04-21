@@ -48,4 +48,47 @@ Description of passed exams for each career
 Description of exams information for each career in aggregated form
 
 ### SPEET_EXAMS_STATS.csv
-Description of exams statistics. I am not sure if they are reliable
+Description of exams statistics. I am not sure if they are reliable...
+
+### SPPET_MOBILITY.csv
+Description of students mobility. Mobility is a period of study abroad. 
+
+#### Features
+- SI_FLTP: ?
+- SI_CFU_CONV: why could be null?
+We can aggregate CFU and days spent with the fraction CFU_CONV/days to give an idea of the effort spent abroad. More days with less credits in probably worst than the opposite. Also, for the early dropout, we should consider only the mobility related to the first year.
+
+### SPEET_POP_PLUS.csv
+Careers of the students from the first level degree (Bachelor's degree).
+
+#### Features
+- NAS_COM_PRV_CPL_FL: ?
+- NAS_STT_ID: ?
+- PERS_CITT_STT_ID: ?
+- CAR_N: ?
+- CARR_DETT_FLTP: ?
+- CARR_INGR_FLTP: ?
+- CARR_INI_AA vs CARR_INGR_AA: ?
+- CARR_FLST: ?
+- CARR_FIN_FLTP: ?
+- CDS_POLI_EDU_FLD: Faculty type
+
+### SPEET_PREV_STUDIES.csv
+Description of the previous high school studies for each career.
+
+#### Features
+- TIT_MED_TP_CD vs TIT_MED_TP_CD_ELAB: ?
+- TIT_MED_GEO_COM_PRV_CPL_FL: ?
+- TI_MED_GEO_STT_ID: Nation ID of previous high school studies 
+
+### SPEET_RESIDENZE.csv
+Description of students residence and domicile.
+
+#### Features
+- RES_NUMERO: ?
+- DOM_NUMERO: ?
+- RES_IMM_PERS_INDIR_FLTP: ?
+- RES_* vd RDM_*: ?
+- DOM_* vs DOM_MAGG_*:?
+- CHK_PERS_UK: ?
+- CHK_CARR_UK: ?
