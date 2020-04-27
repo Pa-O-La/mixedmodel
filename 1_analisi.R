@@ -23,6 +23,11 @@ careers <- read.csv(paste0(mydirdi,'SPEET_POP_PLUS.csv'))
 prev_studies <- read.csv(paste0(mydirdi,'SPEET_PREV_STUDIES.csv'))
 #residenze e domicilio per capire se essere pendolari o fuori casa influisce
 home <- read.csv(paste0(mydirdi,'SPEET_RESIDENZE.csv'))
-
+#esami passati
+exams_passed_aggr <- read.csv(paste0(mydirdi,'speet_exams_passed_aggr.csv'))
+#esami non passati ma con numeri di tentativi
+exams_not_passed_aggr <- read.csv(paste0(mydirdi,'speet_exams_not_passed_aggr.csv'))
+#esami validati
+speet_exams_validated_aggr <- read.csv(paste0(mydirdi,'speet_exams_validated_aggr.csv'))
 
 table(degree_desc)
