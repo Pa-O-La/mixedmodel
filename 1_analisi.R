@@ -5,8 +5,6 @@ mydirdo <- paste0(getwd(),"/data/dataout/")
 
 #descrizione dei corsi di laurea
 degree_desc <- read.csv(paste0(mydirdi,'SPEET_DEGREE_INFORMATION.csv'))
-#esami
-exams <- read.csv(paste0(mydirdi,'SPEET_EXAMS.csv'))
 #not passed exams
 exams_not_passed <- read.csv(paste0(mydirdi, 'SPEET_EXAMS_NOT_PASSED.csv'))
 # passed exams
