@@ -24,3 +24,21 @@ home <- read.csv(paste0(mydirdi,'SPEET_RESIDENZE.csv'))
 
 
 table(degree_desc)
+summary(degree_desc)
+factor (degree_desc$SCOREIMPROVEMENT)
+
+levels(degree_desc$NUMBERATTEMPTSTOBEEVALUATEDONEYEAR)
+
+
+#PA filtra i 3 campi
+library(dplyr)
+degree_desc_ours<-select(degree_desc, starts_with('DEGREEID', 'CDS_POLI_EDU_FLD','DEGREENATURE'))
+c(degree_desc$CDS_ID, degree_desc$DEGREENATURE)
+
+factor(degree_desc$NUMBERATTEMPTSTOENROLESUBJECT)
+#NUMBERATTEMPTSTOENROLESUBJECT
+#NUMBERATTEMPTSTOBEEVALUATEDONEYEAR
+#SCOREIMPROVEMENT
+#degree_desc = degree_desc[] togliere colonne inutili
+degree_desc_ours<-degree_desc (DEGREEID, CDS_POLI_EDU_FLD, DEGREENATURE)
+head(degree_desc_ours)
