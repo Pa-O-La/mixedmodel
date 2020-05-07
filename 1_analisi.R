@@ -5,7 +5,7 @@ mydirdo <- paste0(getwd(),"/data/dataout/")
 
 #descrizione dei corsi di laurea
 degree_desc <- read.csv(paste0(mydirdi,'SPEET_DEGREE_INFORMATION.csv'))
-<<<<<<< HEAD
+
 
 #esami
 #esami non passati ma con numeri di tentativi
@@ -15,16 +15,6 @@ exams_passed_aggr <- read.csv(paste0(mydirdi,'speet_exams_passed_aggr.csv'))
 #esami validati --> valutare se influiscono 
 #pensare ad un'analisi futura sulla correlazione del dropout
 #exams_validated_aggr <- read.csv(paste0(mydirdi,'speet_exams_validated_aggr.csv'))
-
-=======
->>>>>>> a9f188bdd011f0ecc972c81ed17467e7cb263af2
-#not passed exams
-#exams_not_passed <- read.csv(paste0(mydirdi, 'SPEET_EXAMS_NOT_PASSED.csv'))
-# passed exams
-#exams_passed <- read.csv(paste0(mydirdi, 'SPEET_EXAMS_PASSED.csv'))
-#statistiche degli esami
-#exams_stats <- read.csv(paste0(mydirdi,'SPEET_EXAMS_STATS.csv'))
-
 
 #dati di mobilità
 mobility <- read.csv(paste0(mydirdi,'SPEET_MOBILITY.csv'))

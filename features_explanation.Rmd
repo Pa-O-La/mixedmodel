@@ -12,18 +12,10 @@ Degree courses description
 
 #### Features
 - CDS_POLI_EDU_FLD: Faculty type (I: Engeneering, A: Architecture, D: Design)
-<<<<<<< HEAD
 - CDS_TIPO_CD: Bachelor (1) or MSc (2) for degree level
 - NUMBERATTEMPTSTOENROLESUBJECT: -->sempre 5, lo toglierei dall'estrazione
 - NUMBERATTEMPTSTOBEEVALUATEDONEYEAR: -->sempre 5, lo toglierei
 - SCOREIMPROVEMENT: -->sempre No, lo toglierei
-
-=======
-- CDS_TIPO_CD: First (1) or second (2) degree level
-- NUMBERATTEMPTSTOENROLESUBJECT: unknown
-- NUMBERATTEMPTSTOBEEVALUATEDONEYEAR: unknown
-- SCOREIMPROVEMENT: unknown
->>>>>>> a9f188bdd011f0ecc972c81ed17467e7cb263af2
 
 ### SPEET_EXAMS.csv
 ?
