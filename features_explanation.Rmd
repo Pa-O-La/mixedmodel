@@ -12,11 +12,18 @@ Degree courses description
 
 #### Features
 - CDS_POLI_EDU_FLD: Faculty type (I: Engeneering, A: Architecture, D: Design)
+<<<<<<< HEAD
 - CDS_TIPO_CD: Bachelor (1) or MSc (2) for degree level
 - NUMBERATTEMPTSTOENROLESUBJECT: -->sempre 5, lo toglierei dall'estrazione
 - NUMBERATTEMPTSTOBEEVALUATEDONEYEAR: -->sempre 5, lo toglierei
 - SCOREIMPROVEMENT: -->sempre No, lo toglierei
 
+=======
+- CDS_TIPO_CD: First (1) or second (2) degree level
+- NUMBERATTEMPTSTOENROLESUBJECT: unknown
+- NUMBERATTEMPTSTOBEEVALUATEDONEYEAR: unknown
+- SCOREIMPROVEMENT: unknown
+>>>>>>> a9f188bdd011f0ecc972c81ed17467e7cb263af2
 
 ### SPEET_EXAMS.csv
 ?
@@ -26,11 +33,11 @@ Description of not passed exams for each career
 
 #### Features
 - ATTFRM_DN: Name of the exam
-- ESA_SOST_NUM: Number of times the student has tried the exam. If the number is 0 it means the exam has been covalidated from another course/university?
+- ESA_SOST_NUM: Number of times the student has tried the exam. If the number is 0 it means the student has never tried the exam.
 - ESA_SUP_NUM: Should be 0 for all the students?!?!?
 - STUD_ACQSZ_CFU_VOTO: ?
 - STUD_ACQSZ_CFU_LODE: ?
-- STUD_ACQSZ_CFU_MOD_FLTP: Exam status as at the end of the student carrer (S: soprannumero, E: effettivo, C: convalidato) ?????
+- STUD_ACQSZ_CFU_MOD_FLTP: Exam status as at the end of the student carrer (S: superato, E: erasmus, C: convalidato) 
 - STUD_ATTFRM_POSIZ: previous exam status ????
 - STUD_ACQSZ_OK: ?
 - STUD_ATTFRM_FRQ_FLST: ?
@@ -55,22 +62,22 @@ Description of exams statistics. I am not sure if they are reliable...
 Description of students mobility. Mobility is a period of study abroad. 
 
 #### Features
-- SI_FLTP: ?
-- SI_CFU_CONV: why could be null?
+- SI_FLTP: Incoming(I) or Outgoing (O)
+- SI_CFU_CONV: null -> 0
 We can aggregate CFU and days spent with the fraction CFU_CONV/days to give an idea of the effort spent abroad. More days with less credits in probably worst than the opposite. Also, for the early dropout, we should consider only the mobility related to the first year.
 
 ### SPEET_POP_PLUS.csv
 Careers of the students from the first level degree (Bachelor's degree).
 
 #### Features
-- NAS_COM_PRV_CPL_FL: ?
-- NAS_STT_ID: ?
-- PERS_CITT_STT_ID: ?
-- CAR_N: ?
-- CARR_DETT_FLTP: ?
+- NAS_COM_PRV_CPL_FL: capoluogo o no comune di nascita (flag)
+- NAS_STT_ID: ID stato
+- PERS_CITT_STT_ID: cittadinanza id
+- CAR_N: numero carriere
+- CARR_DETT_FLTP: corso di lauera
 - CARR_INGR_FLTP: ?
-- CARR_INI_AA vs CARR_INGR_AA: ?
-- CARR_FLST: ?
+- CARR_INI_AA vs CARR_INGR_AA: inizio carriera puù essere fatto presso altra università
+- CARR_FLST: A: attivo, S sospeso, L laureato, D dropout
 - CARR_FIN_FLTP: ?
 - CDS_POLI_EDU_FLD: Faculty type
 
@@ -78,8 +85,8 @@ Careers of the students from the first level degree (Bachelor's degree).
 Description of the previous high school studies for each career.
 
 #### Features
-- TIT_MED_TP_CD vs TIT_MED_TP_CD_ELAB: ?
-- TIT_MED_GEO_COM_PRV_CPL_FL: ?
+- TIT_MED_TP_CD vs TIT_MED_TP_CD_ELAB: elab è un dato aggregato sulla scuola tecnicca
+- TIT_MED_GEO_COM_PRV_CPL_FL: capoluogo di provincia
 - TI_MED_GEO_STT_ID: Nation ID of previous high school studies 
 
 ### SPEET_RESIDENZE.csv
@@ -90,6 +97,9 @@ Description of students residence and domicile.
 - DOM_NUMERO: ?
 - RES_IMM_PERS_INDIR_FLTP: ?
 - RES_* vd RDM_*: ?
-- DOM_* vs DOM_MAGG_*:?
+- DOM_* vs DOM_MAGG_*: domicilio immatricolazione vs domicilio maggior durata
 - CHK_PERS_UK: ?
 - CHK_CARR_UK: ?
+
+RES_IMM_* dati all'immatricolazione
+RDM_* Residenza durata maggiore
