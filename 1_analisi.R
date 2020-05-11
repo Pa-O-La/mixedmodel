@@ -16,8 +16,6 @@ mobility <- read.csv(paste0(mydirdi,'SPEET_MOBILITY.csv'))
 # there's no mobility on first years
 no_mobility <- merge(mobility, careers, by.x = c('CARR_AN_ID', 'SI_CNT_AA'), by.y = c('CARR_AN_ID', 'CARR_INGR_AA'))
 
-# PREV_STUDIES table - High school diploma
-prev_studies <- read.csv(paste0(mydirdi,'SPEET_PREV_STUDIES.csv'))
 
 # Data Preparation
 

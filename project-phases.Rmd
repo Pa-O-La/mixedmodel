@@ -27,7 +27,9 @@ We also excluded the mobility data because, as expected, no one has gone abroad 
 
 We also excluded the SPEET_DEGREE_INFORMATION.csv table because it useful just to have a description of the degree courses
 
-We also exclude the SPEET_RESIDENZE.csv because we do not think to be able to extract useful information from these data. It would very useful to know if a student was a commuter, however, we think this information is not given by these data. Indeed, there are very few students that modify the domicile information from the personal area as it is not mandatory to do it. 
+We also exclude the SPEET_RESIDENZE.csv because we do not think to be able to extract useful information from these data. It would very useful to know if a student was a commuter, however, we think this information is not given by these data. Indeed, there are very few students that modify the domicile information from the personal area as it is not mandatory to do it.
+
+The table SPEET_PREV_STUDIES.csv is not useful as the high school data has already been integrated in the career table.
 
 ## Data Partitioning
 - Remove the data for prediction
