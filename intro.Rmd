@@ -1,7 +1,5 @@
 ---
 title: "Intro"
-author: "Paola"
-date: "15/4/2020"
 output: html_document
 ---
 
@@ -47,4 +45,49 @@ degree <- read.csv(paste0(mydirdi,'SPEET_DEGREE_INFORMATION.csv'))
 *visualizza le prime righe
 ```{r eval=FALSE}
 table(degree)`
+```
+
+## Description instructions
+
+```{r eval=FALSE}
+table(degree_desc)
+summary(degree_desc)
+factor (degree_desc$SCOREIMPROVEMENT)
+levels(degree_desc$NUMBERATTEMPTSTOBEEVALUATEDONEYEAR)
+class(degree_desc)
+names(degree_desc)
+str(exams_passed_aggr)
+```
+
+## Instructions for EXAMS tables
+```{r eval=FALSE}
+#valutazione esami
+stud <- exams_passed_aggr[which(exams_passed_aggr$CARR_AN_ID == 307342),]
+stud_fallimenti <- exams_not_passed_aggr[which(exams_not_passed_aggr$CARR_AN_ID == 307342),]
+
+stud_2010 <- subset (exams_passed_aggr, exams_passed_aggr$CARR_AN_ID == 307342 
+                                     & exams_passed_aggr$STUD_ATTFRM_FRQ_AA==2010 
+                                     & exams_passed_aggr$TIPO_AGGREGAZIONE =='A')
+stud_2011_1sem <- subset (exams_passed_aggr, exams_passed_aggr$CARR_AN_ID == 307342 
+                          & exams_passed_aggr$STUD_ATTFRM_FRQ_AA==2011 
+                          & exams_passed_aggr$TIPO_AGGREGAZIONE =='S'
+                          & exams_passed_aggr$STUD_ATTFRM_FRQ_SEM ==1)
+stud_pass <- stud_2010
+stud_pass <- append(stud_2011_1sem, )
+```
+
+test<-subset(careers, careers$CARR_ING_ETA<31 & careers$TIT_CONS_VOTO_FS==100)
+
+
+## Remove duplicated elements 
+```{r eval=FALSE}
+exams_aggr_year_sel <- unique(exams_aggr_year_sel)
+```
+
+## Instructions for MOBILITY table
+```{r eval=FALSE}
+#there's no mobility on first years
+my_mob<-merge(mobility, careers, by.x = c('CARR_AN_ID', 'SI_CNT_AA'), by.y = c('CARR_AN_ID', 'CARR_INGR_AA'))
+
+a<-transform(a, pl= a$CARR_INGR_AA+1)
 ```
