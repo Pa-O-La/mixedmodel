@@ -1,7 +1,5 @@
 ---
 title: "Project phases"
-author: "Paola"
-date: "17/4/2020"
 output: html_document
 ---
 
@@ -9,42 +7,34 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1. Data Integration
+## Data Preparation
+The tasks of the data preparation phase are the following:
+- Data Integration 
+- Data Aggregation
+- Feature Selection
+  - Intuition based
+  - Math based (exploiting a score, for example)
+- Missing Values handling
+- Outlier rejection
+
+### Execution
+We first integrated the tables exams_not_passed_aggr.csv and exams_passed_aggr.csv joining them by career ID. For each table we just kept the information aggregated by year and we removed some useless features. Our aim was to provide a model for predicting the early dropout (dropout at the first semester, second year) using the data of the first year. 
+Then, we merged the joined table with the careers table, by career ID and matching the student entrance year with the same year in the exams table. Thus, we resulted with a table where each career has associated the passed and not passed exams data relative to the first year. 
+
+We decided to exclude the speet_exams_validated_aggr.csv table because we do not know how to treat them. These are exames taken outside Polimi and we do not know when they have been passed. 
+
+We also excluded the mobility data because, as expected, no one has gone abroad during its first year of the Bachelor's degree. 
+
+We also excluded the SPEET_DEGREE_INFORMATION.csv table because it useful just to have a description of the degree courses
+
+We also exclude the SPEET_RESIDENZE.csv because we do not think to be able to extract useful information from these data. It would very useful to know if a student was a commuter, however, we think this information is not given by these data. Indeed, there are very few students that modify the domicile information from the personal area as it is not mandatory to do it. 
+
+## Data Partitioning
+- Remove the data for prediction
+- Split the remaining data in training and test
 
 
-```{r cars}
-summary(cars)
-```
-
-## 2. Data Aggregation
-
-exams_aggr
-
-```{r eval=FALSE}
-plot(pressure)
-```
-
-
-## 3. Feature Selection
-
-### Intuition based
-Keep the variable... 
-
-### Math based
-score
-
-## 4. Missing Value
-
-
-## 5. Oulier
-optional?
-
-## 6. Data Partition
-* Remove the data for prediction
-* Split the remaining data in training and test
-
-
-## 7. Mixed MOdel
+## Mixed Effects Model Implementation
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
