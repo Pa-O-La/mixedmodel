@@ -50,3 +50,24 @@ exams_aggr_year_sel <- exams_aggr_year_sel[c(-3,-6)]
 
 # JOIN of exams table with the CAREERS table
 dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR_AA'), by.y= c('CARR_AN_ID','STUD_ATTFRM_FRQ_AA') , all.x = TRUE )
+
+
+
+# Data Cleaning
+#remove dataset$STUD_AMM_VOTO <0
+dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
+
+# TODO 1766 NA      --->?????? remove o substitute with median/mean?
+summary(dataset$STUD_AMM_VOTO)
+
+#remove CARR_DETT_FLTP (all CL)
+drops <- c("CARR_DETT_FLTP")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
+
+# factor on cds code
+dataset$IMM_CDS_ID <- as.factor(dataset$IMM_CDS_ID)
+
+drops <- c("CDS_POLI_EDU_FLD")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
