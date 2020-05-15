@@ -4,6 +4,12 @@ mydirdo <- paste0(getwd(),"/data/dataout/")
 
 # CAREERS table - first level (Bachelor's degree) careers
 careers <- read.csv(paste0(mydirdi,'careers.csv'))
+# we keep only people that are less than 30 years old because older people have
+# different paces and different ways to handle the studies, so they cannot be used
+# to predict younger people. Also, a maximum grade different than 100 from the high
+# school means that those people are older (for example, 60 as maximum grade was
+# used in the past)
+careers <- subset(careers, careers$CARR_ING_ETA<31 & careers$TIT_CONS_VOTO_FS==100)
 
 # EXAMS tables
 # Not passed exams aggregated by semester (S), year (Y), and total (T)

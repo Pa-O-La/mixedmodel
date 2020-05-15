@@ -76,8 +76,6 @@ stud_pass <- stud_2010
 stud_pass <- append(stud_2011_1sem, )
 ```
 
-test<-subset(careers, careers$CARR_ING_ETA<31 & careers$TIT_CONS_VOTO_FS==100)
-
 
 ## Remove duplicated elements 
 ```{r eval=FALSE}
