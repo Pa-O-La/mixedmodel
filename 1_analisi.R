@@ -54,7 +54,7 @@ dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR
 
 
 # Data Cleaning
-# remove dataset$STUD_AMM_VOTO <0
+# remove dataset$STUD_AMM_VOTO<0 (7 negative values)
 dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 
 # TODO 1766 NA      --->?????? remove o substitute with median/mean?
