@@ -31,6 +31,11 @@ We also exclude the SPEET_RESIDENZE.csv because we do not think to be able to ex
 
 The table SPEET_PREV_STUDIES.csv is not useful as the high school data has already been integrated in the career table.
 
+### Features check
+For each features we checked the possible values and the presence of missing values.
+
+- STUD_AMM_VOTO: 1766 missing values. Also we removed negative values because they are 7, thus very few. 
+
 ## Data Partitioning
 - Remove the data for prediction
 - Split the remaining data in training and test
