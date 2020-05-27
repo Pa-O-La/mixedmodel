@@ -54,20 +54,82 @@ dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR
 
 
 # Data Cleaning
-#remove dataset$STUD_AMM_VOTO <0
+# remove dataset$STUD_AMM_VOTO <0
 dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 
 # TODO 1766 NA      --->?????? remove o substitute with median/mean?
 summary(dataset$STUD_AMM_VOTO)
 
-#remove CARR_DETT_FLTP (all CL)
+# remove CARR_DETT_FLTP features because the values are all the same (CL - Corso di Laurea)
 drops <- c("CARR_DETT_FLTP")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-
-# factor on cds code
+# we convert the feature IMM_CDS_ID to factor type instead of numerical
 dataset$IMM_CDS_ID <- as.factor(dataset$IMM_CDS_ID)
 
+# we drop CDS_POLI_EDU_FLD feature beacuse the values are all the same (I - Ingegneria)
 drops <- c("CDS_POLI_EDU_FLD")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
+# we convert the feature UIS_CDS_ID to factor type instead of numerical
+dataset$UIS_CDS_ID <- as.factor(dataset$UIS_CDS_ID)
+
+# we drop the features HOM_GEO_PRV_CD and HOM_GEO_REG_DN because 
+# we just keep the name of the province. We cannot keep the province ID code
+# because Naples has as ID code "NA" that is interpreted as null value
+drops <- c("HOM_GEO_PRV_CD", "HOM_GEO_REG_DN")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
+# TODO there are only 47 people that has an S in HOM_IMM_CHANGED_COUNTRY
+# can we remove them???
+summary(dataset$HOM_IMM_CHANGED_COUNTRY)
+
+# TODO there are 2 people with no TIT_MED_TP_CD_ELAB. Remove them?
+summary(dataset$TIT_MED_TP_CD_ELAB)
+
+# we remove PREVIOUSSTUDIES feature because it's just the explanation
+# of the TIT_MED_TP_CD_ELAB feature
+drops <- c("PREVIOUSSTUDIES")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
+# TODO TIT_MED_GEO_PRV_CD contains "NA" that is interpreted as null value so 
+# we have to substitute them. How can we know if they are from Naples 
+# or null values?
+# Meaning of "n.d." values?
+
+# we drop the feature TIT_MED_GEO_REG because 
+# we just keep the name of the province.
+drops <- c("TIT_MED_GEO_REG")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
+# TIT_MED_GEO_STT_ID should be interpreted as a categorical value as it is
+# a country ID
+dataset$TIT_MED_GEO_STT_ID <- as.factor(dataset$TIT_MED_GEO_STT_ID)
+
+# we drop the feature TIT_MED_STT_DN because 
+# we just keep the country ID.
+drops <- c("TIT_MED_STT_DN")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
+# TODO TIT_CONS_VOTO has one null value. Remove it?
+summary(dataset$TIT_CONS_VOTO)
+
+# we drop the feature TIT_CONS_VOTO_FS because the values are all 100
+drops <- c("TIT_CONS_VOTO_FS")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
+# TODO meaning of "-" tax?
+summary(dataset$TAX)
+
+# TODO CFU_PASSATI contains 1471 null values
+summary(dataset$CFU_PASSATI)
+
+# TODO there are 10127 students with NA as MEDIA_PESATA
+# Likely, most of them, has 0 in CFU_PASSATI. So, MEDIA_PESATA could be replaced
+# just with 0
+summary(dataset$MEDIA_PESATA)
+
+# TODO there are 1471 null values. They seems the same of CFU_PASSATI.
+# Thus, there are 1471 people with no CFU information. Should we delete them
+# or just put 0? Why do they have a null value?
+summary(dataset$FAILED_CFU)
