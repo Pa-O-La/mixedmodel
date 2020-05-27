@@ -57,7 +57,10 @@ dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR
 # remove dataset$STUD_AMM_VOTO<0 (7 negative values)
 dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 
-# TODO 1766 NA      --->?????? remove o substitute with median/mean?
+# TODO 1766 NA. Do we remove o substitute with median/mean?
+summary(dataset$STUD_AMM_VOTO)
+median_missing = median(dataset$STUD_AMM_VOTO, na.rm=TRUE)
+dataset$STUD_AMM_VOTO <- dplyr::transmute(dataset, replace_median_grade  = ifelse(is.na(STUD_AMM_VOTO), median_missing, STUD_AMM_VOTO))
 summary(dataset$STUD_AMM_VOTO)
 
 # remove CARR_DETT_FLTP features because the values are all the same (CL - Corso di Laurea)
@@ -84,7 +87,8 @@ dataset <- dataset[ , !(names(dataset) %in% drops)]
 # can we remove them???
 summary(dataset$HOM_IMM_CHANGED_COUNTRY)
 
-# TODO there are 2 people with no TIT_MED_TP_CD_ELAB. Remove them?
+# TODO there are 2 people with no TIT_MED_TP_CD_ELAB. Remove them? 
+# What does "-E" mean?
 summary(dataset$TIT_MED_TP_CD_ELAB)
 
 # we remove PREVIOUSSTUDIES feature because it's just the explanation
@@ -112,6 +116,8 @@ drops <- c("TIT_MED_STT_DN")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
 # TODO TIT_CONS_VOTO has one null value. Remove it?
+summary(dataset$TIT_CONS_VOTO)
+dataset <- dataset[complete.cases(dataset[, "TIT_CONS_VOTO"]), ]
 summary(dataset$TIT_CONS_VOTO)
 
 # we drop the feature TIT_CONS_VOTO_FS because the values are all 100
