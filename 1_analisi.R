@@ -51,13 +51,18 @@ exams_aggr_year_sel <- exams_aggr_year_sel[c(-3,-6)]
 # JOIN of exams table with the CAREERS table
 dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR_AA'), by.y= c('CARR_AN_ID','STUD_ATTFRM_FRQ_AA') , all.x = TRUE )
 
+# COURSES CATALOGUE
+courses_catalogue <- read.csv(paste0(mydirdi,'course_cat.csv'))
+drops <- c("CDS_DN", "SEDE", "CDS_SIGLA")
+courses_catalogue <- courses_catalogue[ , !(names(courses_catalogue) %in% drops)]
+dataset <- merge(dataset, courses_catalogue, by.x = c('IMM_CDS_ID'), by.y= c('CDS_ID') , all.x = TRUE )
 
 
 # Data Cleaning
 # remove dataset$STUD_AMM_VOTO<0 (7 negative values)
 dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 
-# TODO 1766 NA. Do we remove o substitute with median/mean?
+# 1766 NA. We substitute them with the median value
 summary(dataset$STUD_AMM_VOTO)
 median_missing = median(dataset$STUD_AMM_VOTO, na.rm=TRUE)
 dataset$STUD_AMM_VOTO <- dplyr::transmute(dataset, replace_median_grade  = ifelse(is.na(STUD_AMM_VOTO), median_missing, STUD_AMM_VOTO))
@@ -67,55 +72,69 @@ summary(dataset$STUD_AMM_VOTO)
 drops <- c("CARR_DETT_FLTP")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# we convert the feature IMM_CDS_ID to factor type instead of numerical
-dataset$IMM_CDS_ID <- as.factor(dataset$IMM_CDS_ID)
+# we drop IMM_CDS_ID because different IDs can correspond to the same course
+drops <- c("IMM_CDS_ID", "CDS_DN")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
 
 # we drop CDS_POLI_EDU_FLD feature beacuse the values are all the same (I - Ingegneria)
 drops <- c("CDS_POLI_EDU_FLD")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# we convert the feature UIS_CDS_ID to factor type instead of numerical
-dataset$UIS_CDS_ID <- as.factor(dataset$UIS_CDS_ID)
+# we drop the feature UIS_CDS_ID because we focus on the first step of the career
+drops <- c("UIS_CDS_ID")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
 
 # we drop the features HOM_GEO_PRV_CD and HOM_GEO_REG_DN because 
 # we just keep the name of the province. We cannot keep the province ID code
 # because Naples has as ID code "NA" that is interpreted as null value
+# and foreign countries all have "n.a." as code, thus we could not know the exact name of
+# the country
 drops <- c("HOM_GEO_PRV_CD", "HOM_GEO_REG_DN")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# TODO there are only 47 people that has an S in HOM_IMM_CHANGED_COUNTRY
-# can we remove them???
-summary(dataset$HOM_IMM_CHANGED_COUNTRY)
+# there are only 47 people that has an S in HOM_IMM_CHANGED_COUNTRY
+# thus we drop the column
+drops <- c("HOM_IMM_CHANGED_COUNTRY")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# TODO there are 2 people with no TIT_MED_TP_CD_ELAB. Remove them? 
-# What does "-E" mean?
+# there are 2 people with no TIT_MED_TP_CD_ELAB, thus we remove them
 summary(dataset$TIT_MED_TP_CD_ELAB)
+dataset <- dataset[dataset$TIT_MED_TP_CD_ELAB != "- ", ]
 
 # we remove PREVIOUSSTUDIES feature because it's just the explanation
 # of the TIT_MED_TP_CD_ELAB feature
 drops <- c("PREVIOUSSTUDIES")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# TODO TIT_MED_GEO_PRV_CD contains "NA" that is interpreted as null value so 
-# we have to substitute them. How can we know if they are from Naples 
-# or null values?
+# TIT_MED_GEO_PRV_CD contains "NA" that is interpreted as null value so 
+# we have to substitute them. Instead, null values are denoted as "n.a."
 # Meaning of "n.d." values?
+dataset$TIT_MED_GEO_PRV_CD <- as.character(dataset$TIT_MED_GEO_PRV_CD)
+dataset[is.na(dataset$TIT_MED_GEO_PRV_CD) & dataset$TIT_MED_GEO_REG=="Campania", "TIT_MED_GEO_PRV_CD"] <- "NAP"
+dataset$TIT_MED_GEO_REG <- as.character(dataset$TIT_MED_GEO_REG)
+dataset[dataset$TIT_MED_GEO_PRV_CD == "n.a.", "TIT_MED_GEO_PRV_CD"] <- dataset[dataset$TIT_MED_GEO_PRV_CD == "n.a.", "TIT_MED_GEO_REG"]
+dataset$TIT_MED_GEO_PRV_CD[which(dataset$TIT_MED_GEO_PRV_CD == "n.d.")] <- NA
+dataset$TIT_MED_GEO_PRV_CD <- as.factor(dataset$TIT_MED_GEO_PRV_CD)
+dataset <- dataset[complete.cases(dataset[, "TIT_MED_GEO_PRV_CD"]), ]
 
 # we drop the feature TIT_MED_GEO_REG because 
 # we just keep the name of the province.
 drops <- c("TIT_MED_GEO_REG")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# TIT_MED_GEO_STT_ID should be interpreted as a categorical value as it is
-# a country ID
-dataset$TIT_MED_GEO_STT_ID <- as.factor(dataset$TIT_MED_GEO_STT_ID)
+# ...
+dataset$TIT_MED_STT_DN <- as.character(dataset$TIT_MED_STT_DN)
+dataset[dataset$TIT_MED_GEO_STT_ID!=1, "TIT_MED_STT_DN"] <- "Estero"
+dataset$TIT_MED_STT_DN <- as.factor(dataset$TIT_MED_STT_DN)
+drops <- c("TIT_MED_GEO_STT_ID")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
 
 # we drop the feature TIT_MED_STT_DN because 
 # we just keep the country ID.
 drops <- c("TIT_MED_STT_DN")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# TODO TIT_CONS_VOTO has one null value. Remove it?
+# TIT_CONS_VOTO has one null value thus we remove it
 summary(dataset$TIT_CONS_VOTO)
 dataset <- dataset[complete.cases(dataset[, "TIT_CONS_VOTO"]), ]
 summary(dataset$TIT_CONS_VOTO)
@@ -124,18 +143,30 @@ summary(dataset$TIT_CONS_VOTO)
 drops <- c("TIT_CONS_VOTO_FS")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# TODO meaning of "-" tax?
+# we remove the student with "-" in the tax features (they are 106 values and they are all
+# related to 2010)
+summary(dataset$TAX)
+dataset <- dataset[dataset$TAX != "-", ]
 summary(dataset$TAX)
 
-# TODO CFU_PASSATI contains 1471 null values
+# CFU_PASSATI contains 1471 null values
+summary(dataset$CFU_PASSATI)
+dataset[is.na(dataset$CFU_PASSATI), "CFU_PASSATI"] <- 0
 summary(dataset$CFU_PASSATI)
 
-# TODO there are 10127 students with NA as MEDIA_PESATA
+# there are 10127 students with NA as MEDIA_PESATA
 # Likely, most of them, has 0 in CFU_PASSATI. So, MEDIA_PESATA could be replaced
 # just with 0
 summary(dataset$MEDIA_PESATA)
+dataset[is.na(dataset$MEDIA_PESATA) & dataset$CFU_PASSATI==0, "MEDIA_PESATA"] <- 0
+summary(dataset$MEDIA_PESATA)
 
-# TODO there are 1471 null values. They seems the same of CFU_PASSATI.
+# there are 1471 null values. They seems the same of CFU_PASSATI.
 # Thus, there are 1471 people with no CFU information. Should we delete them
 # or just put 0? Why do they have a null value?
 summary(dataset$FAILED_CFU)
+dataset[is.na(dataset$FAILED_CFU), "FAILED_CFU"] <- 0
+summary(dataset$FAILED_CFU)
+
+# update of the levels
+dataset <- droplevels(dataset)
