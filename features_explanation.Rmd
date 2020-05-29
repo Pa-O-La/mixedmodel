@@ -67,7 +67,7 @@ Careers of the students from the first level degree (Bachelor's degree).
 - PERS_CITT_STT_ID: cittadinanza id
 - CAR_N: numero carriere
 - CARR_DETT_FLTP: corso di lauera
-- CARR_INGR_FLTP: ?
+- CARR_INGR_FLTP: I (Immatricolati puri) - P(Trasferimenti di ingresso da università italiane) - A(Abbreviazioni di corso, crediti riconosciuti da carriere precedenti)
 - CARR_INI_AA vs CARR_INGR_AA: inizio carriera può essere fatto presso altra università
 - CARR_FLST: A: attivo, S sospeso, L laureato, D dropout
 - CARR_FIN_FLTP: ?
@@ -95,3 +95,14 @@ Description of students residence and domicile.
 
 RES_IMM_* dati all'immatricolazione
 RDM_* Residenza durata maggiore
+
+## CAREERS
+
+### Features
+- HOM_GEO_* : where the student has passed more time, the highest in time between domicile and residence
+
+## DATASET
+
+### Features
+- The same CDS_DN can have different IMM_CDS_ID, for example, because the same course is given in 
+another Polimi branch/city
