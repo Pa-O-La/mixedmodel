@@ -170,3 +170,7 @@ summary(dataset$FAILED_CFU)
 
 # update of the levels
 dataset <- droplevels(dataset)
+
+# save the dataset
+write.csv(dataset, paste0(mydirdo,'dataset.csv'), row.names = FALSE)
+
