@@ -57,6 +57,8 @@ drops <- c("CDS_DN", "SEDE", "CDS_SIGLA")
 courses_catalogue <- courses_catalogue[ , !(names(courses_catalogue) %in% drops)]
 dataset <- merge(dataset, courses_catalogue, by.x = c('IMM_CDS_ID'), by.y= c('CDS_ID') , all.x = TRUE )
 
+# Dataset description
+str(dataset)
 
 # Data Cleaning
 # remove dataset$STUD_AMM_VOTO<0 (7 negative values)
@@ -65,7 +67,11 @@ dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 # 1766 NA. We substitute them with the median value
 summary(dataset$STUD_AMM_VOTO)
 median_missing = median(dataset$STUD_AMM_VOTO, na.rm=TRUE)
-dataset$STUD_AMM_VOTO <- dplyr::transmute(dataset, replace_median_grade  = ifelse(is.na(STUD_AMM_VOTO), median_missing, STUD_AMM_VOTO))
+#dataset$STUD_AMM_VOTO <- dplyr::transmute(dataset, replace_median_grade  = ifelse(is.na(STUD_AMM_VOTO), median_missing, STUD_AMM_VOTO))
+library(dplyr)
+dataset  <- mutate(dataset, STUD_AMM_VOTO_REPLACED_MEDIAN  = ifelse(is.na(dataset$STUD_AMM_VOTO), median_missing, dataset$STUD_AMM_VOTO))
+drops <- c("STUD_AMM_VOTO")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
 summary(dataset$STUD_AMM_VOTO)
 
 # remove CARR_DETT_FLTP features because the values are all the same (CL - Corso di Laurea)
@@ -122,7 +128,12 @@ dataset <- dataset[complete.cases(dataset[, "TIT_MED_GEO_PRV_CD"]), ]
 drops <- c("TIT_MED_GEO_REG")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
 
-# ...
+# We first transform TIT_MED_STT_DN as character to add the new level Estero
+# Estero is given in case the country ID is different than "1", where 1 is Italy
+# Than we drop the column TIT_MED_GEO_STT_ID because we keep the names of the
+# countries
+# The creation of this variables serves as a flag to say if the high school
+# provenience is Italia or Estero (abroad)
 dataset$TIT_MED_STT_DN <- as.character(dataset$TIT_MED_STT_DN)
 dataset[dataset$TIT_MED_GEO_STT_ID!=1, "TIT_MED_STT_DN"] <- "Estero"
 dataset$TIT_MED_STT_DN <- as.factor(dataset$TIT_MED_STT_DN)
@@ -168,9 +179,21 @@ summary(dataset$FAILED_CFU)
 dataset[is.na(dataset$FAILED_CFU), "FAILED_CFU"] <- 0
 summary(dataset$FAILED_CFU)
 
-# update of the levels
+# Update of the levels
 dataset <- droplevels(dataset)
 
+# We remove null rows and update row names (indices)
+# complete.cases(dataset)
+# is.na(dataset)
+dataset <- na.omit(dataset)
+
+# Load package for saving csv files
+library(data.table)
+
+# Write CSV
+fwrite(dataset, paste0(mydirdo,'dataset.csv'))
+
 # save the dataset
-write.csv(dataset, paste0(mydirdo,'dataset.csv'), row.names = FALSE)
+#write.csv(dataset, paste0(mydirdo,'dataset.csv'), row.names = FALSE)
+
 
