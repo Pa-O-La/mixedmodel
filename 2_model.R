@@ -19,12 +19,16 @@ dataset_2019 <- dataset[dataset$CARR_INGR_AA==2019, ]
 dataset_2019_excluded <- dataset[dataset$CARR_INGR_AA!=2019, ]
 
 dataset_until_2016 <- dataset[dataset$CARR_INGR_AA!=2019 & dataset$CARR_INGR_AA!=2018 & dataset$CARR_INGR_AA!=2017, ]
+# Update of the levels
+dataset_until_2016 <- droplevels(dataset_until_2016)
+
 
 # Split the data into training and test set
 set.seed(123)
-training.samples <- createDataPartition(dataset_2019_excluded$CARR_FLST, p = 0.8, list = FALSE)
-train.data  <- dataset[training.samples, ]
-test.data <- dataset[-training.samples, ]
+training.samples <- createDataPartition(dataset_until_2016$STATUS, p = 0.8, list = FALSE)
+train.data  <- dataset_until_2016[training.samples, ]
+test.data <- dataset_until_2016[-training.samples, ]
+
 # Build the model
 model <- lm(Fertility ~., data = train.data)
 # Make predictions and compute the R2, RMSE and MAE
