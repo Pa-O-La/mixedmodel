@@ -3,7 +3,7 @@ mydirdi <- paste0(getwd(),"/data/datain/")
 mydirdo <- paste0(getwd(),"/data/dataout/")
 
 # CAREERS table - first level (Bachelor's degree) careers
-careers <- read.csv(paste0(mydirdi,'careers3.csv'))
+careers <- read.csv(paste0(mydirdi,'careers.csv'))
 # we keep only people that are less than 30 years old because older people have
 # different paces and different ways to handle the studies, so they cannot be used
 # to predict younger people. Also, a maximum grade different than 100 from the high
@@ -199,11 +199,5 @@ library(data.table)
 
 # Write CSV
 fwrite(dataset, paste0(mydirdo,'dataset.csv'))
-
-  
-  
-  
-# save the dataset
-#write.csv(dataset, paste0(mydirdo,'dataset.csv'), row.names = FALSE)
 
 
