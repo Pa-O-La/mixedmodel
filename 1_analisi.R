@@ -51,11 +51,11 @@ exams_aggr_year_sel <- exams_aggr_year_sel[c(-3,-6)]
 # JOIN of exams table with the CAREERS table
 dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR_AA'), by.y= c('CARR_AN_ID','STUD_ATTFRM_FRQ_AA') , all.x = TRUE )
 
-# COURSES CATALOGUE
-courses_catalogue <- read.csv(paste0(mydirdi,'course_cat.csv'))
-drops <- c("CDS_DN", "SEDE", "CDS_SIGLA")
-courses_catalogue <- courses_catalogue[ , !(names(courses_catalogue) %in% drops)]
-dataset <- merge(dataset, courses_catalogue, by.x = c('IMM_CDS_ID'), by.y= c('CDS_ID') , all.x = TRUE )
+# COURSES CATALOGUE --> added in careers
+#courses_catalogue <- read.csv(paste0(mydirdi,'course_cat.csv'))
+#drops <- c("CDS_DN", "SEDE", "CDS_SIGLA")
+#courses_catalogue <- courses_catalogue[ , !(names(courses_catalogue) %in% drops)]
+#dataset <- merge(dataset, courses_catalogue, by.x = c('IMM_CDS_ID'), by.y= c('CDS_ID') , all.x = TRUE )
 
 # Dataset description
 str(dataset)
@@ -67,7 +67,6 @@ dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 # 1766 NA. We substitute them with the median value
 summary(dataset$STUD_AMM_VOTO)
 median_missing = median(dataset$STUD_AMM_VOTO, na.rm=TRUE)
-#dataset$STUD_AMM_VOTO <- dplyr::transmute(dataset, replace_median_grade  = ifelse(is.na(STUD_AMM_VOTO), median_missing, STUD_AMM_VOTO))
 library(dplyr)
 dataset  <- mutate(dataset, STUD_AMM_VOTO_REPLACED_MEDIAN  = ifelse(is.na(dataset$STUD_AMM_VOTO), median_missing, dataset$STUD_AMM_VOTO))
 drops <- c("STUD_AMM_VOTO")
@@ -122,6 +121,10 @@ dataset[dataset$TIT_MED_GEO_PRV_CD == "n.a.", "TIT_MED_GEO_PRV_CD"] <- dataset[d
 dataset$TIT_MED_GEO_PRV_CD[which(dataset$TIT_MED_GEO_PRV_CD == "n.d.")] <- NA
 dataset$TIT_MED_GEO_PRV_CD <- as.factor(dataset$TIT_MED_GEO_PRV_CD)
 dataset <- dataset[complete.cases(dataset[, "TIT_MED_GEO_PRV_CD"]), ]
+#remove the duplicated column
+drops <- c("TIT_MED_GEO_PRV_CD_2")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
 
 # we drop the feature TIT_MED_GEO_REG because 
 # we just keep the name of the province.
@@ -179,6 +182,10 @@ summary(dataset$FAILED_CFU)
 dataset[is.na(dataset$FAILED_CFU), "FAILED_CFU"] <- 0
 summary(dataset$FAILED_CFU)
 
+# we drop CARR_FLST because STATUS has the same value with the distinction between Early and Late dropout
+drops <- c("CARR_FLST")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+
 # Update of the levels
 dataset <- droplevels(dataset)
 
@@ -193,6 +200,9 @@ library(data.table)
 # Write CSV
 fwrite(dataset, paste0(mydirdo,'dataset.csv'))
 
+  
+  
+  
 # save the dataset
 #write.csv(dataset, paste0(mydirdo,'dataset.csv'), row.names = FALSE)
 
