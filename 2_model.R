@@ -52,6 +52,7 @@ cf1 <- cforest(STATUS~. , data=dataset_until_2016[,c(2:19)], control=cforest_unb
 # Features importance
 variable_importance <- varimp(cf1)
 sort(variable_importance)
+# we leave CFU_PASSATI out because it's correlated to MEDIA_PESATA (0.79)
 
 # Split the data into temp and test set
 set.seed(123)
@@ -65,7 +66,25 @@ train.data <- temp.data[training.samples, ]
 validation.data <- temp.data[-training.samples, ]
 
 
+# Model 0: simple linear regression as comparison
 # we leave CFU_PASSATI out because it's correlated to MEDIA_PESATA (0.79)
+mod0 <- glm(STATUS~CARR_ING_ETA+
+              CHANGEDEGREE+CFU_PASSATI+
+              TIT_CONS_VOTO+TAX+
+              FAILED_CFU, family=binomial, data=train.data)
+
+predictions <- predict(mod0, validation.data, type="response")
+actual_true_predictions <- predictions[validation.data$STATUS == 1]
+actual_false_predictions <- predictions[validation.data$STATUS == 0]
+# ROC Curve    
+#roc <- roc.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
+#plot(roc)
+# PR Curve
+pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
+plot(pr) # PRAUC = 0.8286008
+
+
+
 # Build the model - Basic Linear Regression
 mod1 <- glmer(STATUS~(1|COURSE)+CARR_ING_ETA+
                                       CHANGEDEGREE+CFU_PASSATI+
@@ -73,17 +92,11 @@ mod1 <- glmer(STATUS~(1|COURSE)+CARR_ING_ETA+
                                       FAILED_CFU, family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
 
 predictions <- predict(mod1, validation.data, type="response")
-
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
 actual_false_predictions <- predictions[validation.data$STATUS == 0]
-
-# ROC Curve    
-roc <- roc.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
-plot(roc)
-
 # PR Curve
 pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
-plot(pr)
+plot(pr) # PRAUC = 0.8326352
 
 
 # We choose mod* because it has the highest AUC value
