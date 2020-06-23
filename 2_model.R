@@ -83,14 +83,12 @@ actual_false_predictions <- predictions[validation.data$STATUS == 0]
 pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
 plot(pr) # PRAUC = 0.8286008
 
-
-
-# Build the model - Basic Linear Regression
+# Model 1: COURSE as random effect
 mod1 <- glmer(STATUS~(1|COURSE)+CARR_ING_ETA+
                                       CHANGEDEGREE+CFU_PASSATI+
                                       TIT_CONS_VOTO+TAX+
                                       FAILED_CFU, family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
-
+# TAX is dropped because it's a categorical feature
 predictions <- predict(mod1, validation.data, type="response")
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
 actual_false_predictions <- predictions[validation.data$STATUS == 0]
@@ -98,6 +96,24 @@ actual_false_predictions <- predictions[validation.data$STATUS == 0]
 pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
 plot(pr) # PRAUC = 0.8326352
 
+# Model 2: COURSE and HOM_GEO_PRV_DN as random effects
+mod2 <- glmer(STATUS~(1|COURSE)+(1|HOM_GEO_PRV_DN)+CARR_ING_ETA+
+                CHANGEDEGREE+CFU_PASSATI+
+                TIT_CONS_VOTO+TAX+
+                FAILED_CFU, family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
+
+predictions <- predict(mod2, validation.data, type="response")
+actual_true_predictions <- predictions[validation.data$STATUS == 1]
+actual_false_predictions <- predictions[validation.data$STATUS == 0]
+# PR Curve
+pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
+plot(pr) # PRAUC = 0.8220624
+
+# Model Selection Using Akaike’s Information Criterion (AIC)
+#  The simplest models with the lowest AIC values are considered 
+# the best-fitting models, with the important caveat that models
+# within ΔAIC of 2 are considered to have equivalent fit 
+AIC(mod0, mod1, mod2)
 
 # We choose mod* because it has the highest AUC value
 # We set the probability threshold to 0.4
