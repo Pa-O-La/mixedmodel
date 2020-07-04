@@ -23,11 +23,16 @@ exams_passed_aggr <- rename (exams_passed_aggr, STUD_ATTFRM_FRQ_AA = STUD_ACQSZ_
 exams_passed_aggr <- rename (exams_passed_aggr, STUD_ATTFRM_FRQ_SEM = STUD_ACQSZ_CFU_SEM_CALC )                      
 colnames(exams_passed_aggr)
 
-
 # MOBILITY table (abroad studies)
 mobility <- read.csv(paste0(mydirdi,'SPEET_MOBILITY.csv'))
 # there's no mobility on first years
 no_mobility <- merge(mobility, careers, by.x = c('CARR_AN_ID', 'SI_CNT_AA'), by.y = c('CARR_AN_ID', 'CARR_INGR_AA'))
+
+#Partial Admission Tests Value 
+tol_ing_norm <- read.csv(paste0(mydirdi,'parziali_ing_norm.csv')) 
+tol_ing_norm <- subset(tol_ing_norm, tol_ing_norm$AMMLP_SESS_AA>=2010)
+tol_ing_norm <- subset( tol_ing_norm, select = c(CARR_AN_ID, CV_NOR_YY, ENG_NOR_YY, FIS_NOR_YY, MAT_NOR_YY ) )
+careers <- merge(careers, tol_ing_norm, by.x = 'CARR_AN_ID', by.y = 'CARR_AN_ID', all.x = TRUE)
 
 
 # Data Preparation
@@ -202,7 +207,7 @@ dataset <- droplevels(dataset)
 # complete.cases(dataset)
 # is.na(dataset)
 
-#dataset <- na.omit(dataset)
+dataset <- na.omit(dataset)
 
 # Load package for saving csv files
 library(data.table)
