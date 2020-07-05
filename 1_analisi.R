@@ -15,7 +15,7 @@ careers <- subset(careers, careers$CARR_ING_ETA<31 & careers$TIT_CONS_VOTO_FS==1
 # Not passed exams aggregated by semester (S), year (Y), and total (T)
 exams_not_passed_aggr <- read.csv(paste0(mydirdi,'exams_not_passed_aggr.csv'))
 # Passed exmaes aggregated as above
-exams_passed_aggr <- read.csv(paste0(mydirdi,'exams_passed_aggr.csv'))
+exams_passed_aggr <- read.csv(paste0(mydirdi,'exams_passed_aggr_vw.csv'))
 
 # MOBILITY table (abroad studies)
 mobility <- read.csv(paste0(mydirdi,'SPEET_MOBILITY.csv'))

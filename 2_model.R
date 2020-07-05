@@ -124,3 +124,4 @@ factorized_predictions <- as.factor(factorized_predictions)
 test.data$STATUS <- as.factor(test.data$STATUS)
 
 confusionMatrix(factorized_predictions, test.data$STATUS, positive="TRUE")
+
