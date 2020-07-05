@@ -34,19 +34,19 @@ pie(table(dataset$TAX))
 dataset$TAX = as.character(dataset$TAX)
 for(i in 1:dim(dataset)[1]){
   dataset$TAX[i]=
-      switch(as.character(dataset$TAX[i]),
-             'LS' = 'LS',
-             '01' = 'BASSA', #valutare se mettere con LS
-             '02' = 'BASSA',
-             '03' = 'BASSA',
-             '04' = 'MEDIA',
-             '05' = 'MEDIA',
-             '06' = 'ALTA',
-             '07' = 'ALTA',
-             '08' = 'ALTA',
-             'CP' = 'CP',
-             dataset$TAX[i] #default lascio invariato
-             )
+    switch(as.character(dataset$TAX[i]),
+           'LS' = 'LS',
+           '01' = 'BASSA', #valutare se mettere con LS
+           '02' = 'BASSA',
+           '03' = 'BASSA',
+           '04' = 'MEDIA',
+           '05' = 'MEDIA',
+           '06' = 'ALTA',
+           '07' = 'ALTA',
+           '08' = 'ALTA',
+           'CP' = 'CP',
+           dataset$TAX[i] #default lascio invariato
+    )
 }
 table(dataset$TAX)
 dataset$TAX = as.factor(dataset$TAX)
@@ -159,9 +159,9 @@ plot(pr) # PRAUC = 0.849
 # Model 1B: COURSE as random effect
 # without STUD_AMM_VOTO_REPLACED_MEDIAN
 mod1B <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
-                #STUD_AMM_VOTO_REPLACED_MEDIAN + 
-                CARR_ING_ETA, family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
+                 FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
+                 #STUD_AMM_VOTO_REPLACED_MEDIAN + 
+                 CARR_ING_ETA, family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
 
 predictions <- predict(mod1B, validation.data, type="response")
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
@@ -212,9 +212,9 @@ plot(pr) # PRAUC = 0.852
 # adding MAT_NOR_YY
 # removing CARR_ING_ETA
 mod1D2 <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                 FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
-                 MAT_NOR_YY 
-                 , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
+                  FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
+                  MAT_NOR_YY 
+                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
 
 predictions <- predict(mod1D2, validation.data, type="response")
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
@@ -246,9 +246,9 @@ plot(pr1E) # PRAUC = 0.855
 # trying to reduce class of categorical variable
 # without TIT_MED_TP_CD_ELAB 
 mod1E2 <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                 FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
-               , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-               ,data=train.data)
+                  FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
+                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+                ,data=train.data)
 
 predictions <- predict(mod1E2, validation.data, type="response")
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
@@ -292,10 +292,10 @@ validation.data.1E3$TIT_MED_TP_CD_ELAB <- relevel(validation.data.1E3$TIT_MED_TP
 table(validation.data.1E3$TIT_MED_TP_CD_ELAB)
 
 mod1E3 <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                 FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
-               + TIT_MED_TP_CD_ELAB
-               , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-               ,data=train.data.1E3)
+                  FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
+                + TIT_MED_TP_CD_ELAB
+                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+                ,data=train.data.1E3)
 
 predictions <- predict(mod1E3, validation.data.1E3, type="response")
 actual_true_predictions <- predictions[validation.data.1E3$STATUS == 1]
@@ -307,10 +307,10 @@ summary(mod1E3)
 
 #we see from summary that TAX is irrilevant
 mod1E3_noTAX <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                  FAILED_CFU + CHANGEDEGREE + TIT_CONS_VOTO +CARR_ING_ETA 
-                + TIT_MED_TP_CD_ELAB
-                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-                ,data=train.data.1E3)
+                        FAILED_CFU + CHANGEDEGREE + TIT_CONS_VOTO +CARR_ING_ETA 
+                      + TIT_MED_TP_CD_ELAB
+                      , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+                      ,data=train.data.1E3)
 
 predictions <- predict(mod1E3_noTAX, validation.data.1E3, type="response")
 actual_true_predictions <- predictions[validation.data.1E3$STATUS == 1]
@@ -323,9 +323,9 @@ summary(mod1E3_noTAX)
 ###AND now trying with 2 intercept
 # with the same sets of previous 
 mod1E3B <- glmer(STATUS~(1|COURSE)+(1|TIT_MED_TP_CD_ELAB)+CFU_PASSATI +
-                  FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
-                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-                ,data=train.data.1E3)
+                   FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
+                 , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+                 ,data=train.data.1E3)
 
 predictions <- predict(mod1E3B, validation.data.1E3, type="response")
 actual_true_predictions <- predictions[validation.data.1E3$STATUS == 1]
@@ -352,10 +352,10 @@ plot(pr2) # PRAUC = 0.855
 # Model 2B: COURSE and TIT_MED_TP_CD_ELAB as random effects
 # with math score MAT_NOR_YY
 mod2B <- glmer(STATUS~(1|COURSE)+(1|TIT_MED_TP_CD_ELAB)+
-                CFU_PASSATI +
-                FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
-                MAT_NOR_YY 
-                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
+                 CFU_PASSATI +
+                 FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
+                 MAT_NOR_YY 
+               , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),data=train.data)
 
 predictions <- predict(mod2B, validation.data, type="response")
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
@@ -381,10 +381,10 @@ pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_f
 plot(pr) # PRAUC = 0.844
 
 mod3 <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                  FAILED_CFU  + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
-                + TIT_MED_TP_CD_ELAB
-                , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-                ,data=train.data.1E3)
+                FAILED_CFU  + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
+              + TIT_MED_TP_CD_ELAB
+              , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+              ,data=train.data.1E3)
 
 
 # Model Selection Using Akaike’s Information Criterion (AIC)
