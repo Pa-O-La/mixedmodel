@@ -1,3 +1,5 @@
+library(dplyr)
+
 # Data upload
 mydirdi <- paste0(getwd(),"/data/datain/")
 mydirdo <- paste0(getwd(),"/data/dataout/")
@@ -15,12 +17,22 @@ careers <- subset(careers, careers$CARR_ING_ETA<31 & careers$TIT_CONS_VOTO_FS==1
 # Not passed exams aggregated by semester (S), year (Y), and total (T)
 exams_not_passed_aggr <- read.csv(paste0(mydirdi,'exams_not_passed_aggr.csv'))
 # Passed exmaes aggregated as above
+#exams_passed_aggr <- read.csv(paste0(mydirdi,'exams_passed_aggr.csv'))
 exams_passed_aggr <- read.csv(paste0(mydirdi,'exams_passed_aggr_vw.csv'))
+exams_passed_aggr <- rename (exams_passed_aggr, STUD_ATTFRM_FRQ_AA = STUD_ACQSZ_CFU_AA )
+exams_passed_aggr <- rename (exams_passed_aggr, STUD_ATTFRM_FRQ_SEM = STUD_ACQSZ_CFU_SEM_CALC )                      
+colnames(exams_passed_aggr)
 
 # MOBILITY table (abroad studies)
 mobility <- read.csv(paste0(mydirdi,'SPEET_MOBILITY.csv'))
 # there's no mobility on first years
 no_mobility <- merge(mobility, careers, by.x = c('CARR_AN_ID', 'SI_CNT_AA'), by.y = c('CARR_AN_ID', 'CARR_INGR_AA'))
+
+#Partial Admission Tests Value 
+tol_ing_norm <- read.csv(paste0(mydirdi,'parziali_ing_norm.csv')) 
+tol_ing_norm <- subset(tol_ing_norm, tol_ing_norm$AMMLP_SESS_AA>=2010)
+tol_ing_norm <- subset( tol_ing_norm, select = c(CARR_AN_ID, CV_NOR_YY, ENG_NOR_YY, FIS_NOR_YY, MAT_NOR_YY ) )
+careers <- merge(careers, tol_ing_norm, by.x = 'CARR_AN_ID', by.y = 'CARR_AN_ID', all.x = TRUE)
 
 
 # Data Preparation
@@ -29,13 +41,13 @@ no_mobility <- merge(mobility, careers, by.x = c('CARR_AN_ID', 'SI_CNT_AA'), by.
 # we keep the aggregated information by year
 exams_pass_aggr_year <- subset(exams_passed_aggr, exams_passed_aggr$AGGR_TYPE=='A')
 # we keep just some selected features: CARR_AN_ID, STUD_ATTFRM_FRQ_AA, CFU_FALLIMENTI, CFU_PASSATI, MEDIA_PESATA
-exams_pass_aggr_year_sel <- exams_pass_aggr_year[c(1,2,6,7,8)]
+exams_pass_aggr_year_sel <- exams_pass_aggr_year[c( 'CARR_AN_ID', 'STUD_ATTFRM_FRQ_AA', 'CFU_FALLIMENTI', 'CFU_PASSATI', 'MEDIA_PESATA')]
 
 # EXAMS NOT PASSED AGGREGATED TABLE
 # we keep the aggregated information by year
 exams_not_pass_aggr_year <- subset(exams_not_passed_aggr, exams_not_passed_aggr$AGGR_TYPE=='A')
 # we keep just some selected features: CARR_AN_ID, STUD_ATTFRM_FRQ_AA, CFU_FALLIMENTI
-exams_not_pass_aggr_year_sel <- exams_not_pass_aggr_year[c(1,2,6)]
+exams_not_pass_aggr_year_sel <- exams_not_pass_aggr_year[c('CARR_AN_ID', 'STUD_ATTFRM_FRQ_AA', 'CFU_FALLIMENTI')]
 
 # JOIN between exams passed and exams not passed modified tables by CAREER ID and YEAR
 exams_aggr_year_sel <- merge(exams_pass_aggr_year_sel, exams_not_pass_aggr_year_sel, by.x = c('CARR_AN_ID', 'STUD_ATTFRM_FRQ_AA'), by.y = c('CARR_AN_ID', 'STUD_ATTFRM_FRQ_AA'), all = TRUE)
@@ -46,7 +58,9 @@ exams_aggr_year_sel$CFU_PASSATI[ is.na(exams_aggr_year_sel$CFU_PASSATI)] <- 0
 # we sum the two features CFU_FALLIMENTI from the JOIN operation into a new variable FAILED_CFU
 exams_aggr_year_sel <- transform(exams_aggr_year_sel, FAILED_CFU=exams_aggr_year_sel$CFU_FALLIMENTI.x+exams_aggr_year_sel$CFU_FALLIMENTI.y)
 # we remove the CFU_FALLIMENTI.x/y features
-exams_aggr_year_sel <- exams_aggr_year_sel[c(-3,-6)]
+drops <- c('CFU_FALLIMENTI.x','CFU_FALLIMENTI.y')
+exams_aggr_year_sel <- exams_aggr_year_sel[ , !(names(exams_aggr_year_sel) %in% drops)]
+
 
 # JOIN of exams table with the CAREERS table
 dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR_AA'), by.y= c('CARR_AN_ID','STUD_ATTFRM_FRQ_AA') , all.x = TRUE )
@@ -67,7 +81,7 @@ dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
 # 1766 NA. We substitute them with the median value
 summary(dataset$STUD_AMM_VOTO)
 median_missing = median(dataset$STUD_AMM_VOTO, na.rm=TRUE)
-library(dplyr)
+
 dataset  <- mutate(dataset, STUD_AMM_VOTO_REPLACED_MEDIAN  = ifelse(is.na(dataset$STUD_AMM_VOTO), median_missing, dataset$STUD_AMM_VOTO))
 drops <- c("STUD_AMM_VOTO")
 dataset <- dataset[ , !(names(dataset) %in% drops)]
@@ -192,6 +206,7 @@ dataset <- droplevels(dataset)
 # We remove null rows and update row names (indices)
 # complete.cases(dataset)
 # is.na(dataset)
+
 dataset <- na.omit(dataset)
 
 # Load package for saving csv files
