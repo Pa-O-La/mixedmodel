@@ -380,18 +380,13 @@ actual_false_predictions <- predictions[validation.data$STATUS == 0]
 pr <- pr.curve(scores.class0 = actual_true_predictions, scores.class1 = actual_false_predictions, curve = T)
 plot(pr) # PRAUC = 0.844
 
-mod3 <- glmer(STATUS~(1|COURSE)+CFU_PASSATI +
-                FAILED_CFU  + TAX + TIT_CONS_VOTO +CARR_ING_ETA 
-              + TIT_MED_TP_CD_ELAB
-              , family=binomial, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-              ,data=train.data.1E3)
 
 
 # Model Selection Using Akaike’s Information Criterion (AIC)
 # The simplest models with the lowest AIC values are considered 
 # the best-fitting models, with the important caveat that models
 # within ΔAIC of 2 are considered to have equivalent fit 
-AIC(mod0, mod0B, mod1, mod1B, mod1C, mod1D, mod1D2, mod1E, mod1E2, mod1E3, mod1E3_noTAX, mod1E3B, mod2, mod2B, mod2D, mod3)
+AIC(mod0, mod0B, mod1, mod1B, mod1C, mod1D, mod1D2, mod1E, mod1E2, mod1E3, mod1E3_noTAX, mod1E3B, mod2, mod2B, mod2D)
 
 
 # We choose mod* because it has the best AIC value
