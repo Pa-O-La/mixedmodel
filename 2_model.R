@@ -140,7 +140,7 @@ validation.data <- temp.data[-training.samples, ]
 
 
 # Model 0: simple linear regression as comparison
-mod0 <- glm(STATUS~+ MEDIA_PESATA + CFU_PASSATI +
+mod0 <- glm(STATUS~ MEDIA_PESATA + CFU_PASSATI +
               FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
               STUD_AMM_VOTO_REPLACED_MEDIAN + 
               CARR_ING_ETA, family=binomial, data=train.data)
@@ -148,7 +148,7 @@ mod0 <- glm(STATUS~+ MEDIA_PESATA + CFU_PASSATI +
 
 # Model 1: simple linear regression as comparison
 # with TIT_MED_TP_CD_ELAB
-mod1 <- glm(STATUS~+ MEDIA_PESATA + CFU_PASSATI +
+mod1 <- glm(STATUS~ MEDIA_PESATA + CFU_PASSATI +
                 FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
                 STUD_AMM_VOTO_REPLACED_MEDIAN + CARR_ING_ETA + TIT_MED_TP_CD_ELAB
                 , family=binomial, data=train.data)
@@ -170,21 +170,15 @@ mod3 <- glmer(STATUS~(1|COURSE) + (1|HOM_GEO_PRV_DN) + MEDIA_PESATA + CFU_PASSAT
                 , optCtrl=list(maxfun=2e5)), data=train.data)
 
 
-# Model 4: COURSE and TIT_MED_TP_CD_ELAB as random effects
-#mod4 <- glmer(STATUS~(1|COURSE) + (1|TIT_MED_TP_CD_ELAB) + CFU_PASSATI +
-#                FAILED_CFU + CHANGEDEGREE + TAX + TIT_CONS_VOTO + 
-#                STUD_AMM_VOTO_REPLACED_MEDIAN + CARR_ING_ETA + TIT_MED_TP_CD_ELAB
-#                , family=binomial, control=glmerControl(optimizer="bobyqa"
-#                , optCtrl=list(maxfun=2e5)), data=train.data)
-
 
 # Model Selection Using Akaike’s Information Criterion (AIC)
 # The simplest models with the lowest AIC values are considered 
 # the best-fitting models, with the important caveat that models
 # within ΔAIC of 2 are considered to have equivalent fit 
-AIC(mod0, mod1, mod2, mod3)#, mod4)
+AIC(mod0, mod1, mod2, mod3)
 # mod3 it's the best one
 summary(mod3)
+
 
 predictions <- predict(mod3, validation.data, re.form=NULL,type="response", allow.new.levels=T)
 actual_true_predictions <- predictions[validation.data$STATUS == 1]
@@ -203,16 +197,3 @@ predictions <- predict(mod3, test.data, re.form=NULL,type="response", allow.new.
 factorized_predictions <- ifelse(predictions>=0.4,1,0)
 factorized_predictions <- as.factor(factorized_predictions)
 confusionMatrix(factorized_predictions, test.data$STATUS, positive = '1')
-
-
-
-
-
-# VPC 
-psiA = as.numeric(summary(mod3)$varcor)
-psiA/(psiA +pi^2/3)             #0.03246094
-
-
-library(lattice)
-rand_intercept = ranef(mod3, condVar=TRUE)
-dotplot(rand_intercept,strip=T, lty= 4)
