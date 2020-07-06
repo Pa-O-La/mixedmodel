@@ -270,3 +270,6 @@ factorized_predictions <- ifelse(predictions>=0.4,1,0)
 factorized_predictions <- as.factor(factorized_predictions)
 confusionMatrix(factorized_predictions, test.data$STATUS, positive = '1')
 ```
+
+## Thank you for the attention
+Questions?
