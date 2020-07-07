@@ -1,0 +1,407 @@
+---
+title: "Mixed Model on Polimi Students Data"
+author: "Riccardo Bertoglio - Paola Mussida"
+date: "07/07/2020"
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(dplyr)
+library(viridis)
+library(plyr)
+library(ggplot2)
+library(treemapify)
+```
+
+
+## Target
+
+**Apply Multilevel Model on PoliMI data to maximise performance on dropout prediction.**
+
+Students are rarely indipendent, they are clustered or nested in a way that makes the observations not truly independent.
+
+
+## Agenda
+
+
+1. Data Preparation
+  - Data Exploration
+  - Data Cleaning
+  - Data Aggregation
+  - Feature Selection
+  - Missing Values
+
+
+2. Models
+  - Data Partition
+  - Model Creation
+  - Results Evaluation
+
+
+
+
+## Careers
+
+
+```{r carrsss, message=FALSE, warning=FALSE, include=FALSE}
+
+# Data upload
+mydirdi <- paste0(getwd(),"/data/datain/")
+mydirdo <- paste0(getwd(),"/data/dataout/")
+
+# CAREERS table - first level (Bachelor's degree) careers
+careers <- read.csv(paste0(mydirdi,'careers.csv'))
+```
+
+
+
+```{r carrrsee, echo=FALSE, message=FALSE, warning=FALSE}
+careers %>%
+    na.omit() %>%
+    ggplot() +
+    geom_bar(aes(x=CARR_INGR_AA , fill= PERS_GENERE)) +
+    scale_x_continuous(breaks=seq(2009, 2020, 1))+
+    labs( fill = 'Gender',
+        x = "years",
+        y = "number of students",
+        title = paste(
+            "Degree student immatricolation"
+        )
+    )
+```
+
+
+
+
+## Career Description
+
+- personal data
+
+- previous studies
+ 
+- admission score
+ 
+- degree course 
+
+- exams
+
+- degree / dropout
+
+
+## Ended careers by course
+
+```{r endcar, echo=FALSE, message=FALSE, warning=FALSE}
+careers %>%
+  filter(STATUS != 'A')  %>%
+    ggplot() +
+    geom_bar(aes(y=COURSE , fill=STATUS ) ) + # STATUS / CARR_FLST
+    labs(
+        x = "total",
+        y = "course",
+        title = paste(
+            "Total amount of ended careers for each course, divided in degree and dropout"
+        )
+    )
+ 
+```
+
+
+## Previous Studies
+
+```{r previous, echo=FALSE, message=FALSE, warning=FALSE}
+studies<- careers
+for( i in 1:length(studies$PREVIOUSSTUDIES )) {
+  if( !is.element(studies$PREVIOUSSTUDIES [i], c("Scientifica", "Tecnica","Straniera", 'Classica', 'Linguistica'))){
+    studies$PREVIOUSSTUDIES [i] = "Other"
+  }
+}
+studies$PREVIOUSSTUDIES <- as.factor(studies$PREVIOUSSTUDIES)
+
+p <- careers[!grepl("\\(", careers$TIT_MED_GEO_REG), ] %>%
+    filter(PREVIOUSSTUDIES == 'Scientifica' | PREVIOUSSTUDIES == 'Tecnica' | PREVIOUSSTUDIES == 'Classica' | PREVIOUSSTUDIES == 'Linguistica' ) %>%
+    ggplot() +
+    geom_bar(aes(x= CARR_INGR_AA, fill=PREVIOUSSTUDIES ) ) +
+    scale_x_continuous(breaks=seq(2009, 2020, 1)) +
+    labs(fill= 'Type of school',
+        x = "years",
+        y = "",
+        title = paste(
+            "Partition of main school typologies over years"
+        )
+    )
+p  # + scale_fill_brewer(palette="Viridis")
+ 
+```
+
+
+## Foreign Previous Studies
+
+```{r states, echo=FALSE, message=FALSE, warning=FALSE}
+#careers[!grepl("\\(", careers$TIT_MED_GEO_REG), ] %>%
+
+states <- count(careers, vars = 'TIT_MED_STT_DN')
+
+states %>%
+  filter(freq>10) %>%
+  filter (TIT_MED_STT_DN!= 'Italia') %>%
+  filter (TIT_MED_STT_DN!= 'Non Definito') %>%
+    ggplot(aes(area=freq  , label = TIT_MED_STT_DN, fill = freq )) +
+    geom_treemap() +
+   labs(title = paste("Principal countries of foreign previuos studies"))+
+    geom_treemap_text(fontface= 'italic', colour = 'white') 
+ 
+```
+
+
+
+## Admission Test - score distribution
+
+```{r tolall, echo=FALSE, message=FALSE, warning=FALSE}
+#careers[!grepl("\\(", careers$TIT_MED_GEO_REG), ] %>%
+p<- careers %>%
+    group_by(CARR_INGR_AA) %>%
+    filter(CARR_FLST != 'A')  %>%
+    filter(STUD_AMM_VOTO >20)  %>%
+    ggplot(aes(x= CARR_FLST , y=STUD_AMM_VOTO )) +#, fill=PERS_GENERE )) +
+    geom_violin(fill='cornflowerblue') + #trim=FALSE) +
+    labs(
+        x = "",
+        y = "Score",
+        title = paste(
+            "Distribution of admission test score (60 - 100) for graduated and dropped students"
+        )
+    )
+
+#p #+ scale_y_discrete(limits=c('55', '105'))
+# violin plot with mean points
+#p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+# violin plot with median points
+#p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p + geom_boxplot(width=0.1)
+```
+
+
+## Data Cleaning
+
+- We focus only on young students (less than 30 years old) because of data distribution. Older people have different paces and different ways to handle the studies, so they cannot be used to predict majority. 
+
+- We remove also maximum value for school grade different than 100  means that those people are outlier (for example, 60 as maximum grade was used in the past)
+
+
+```{r ghgh, message=FALSE, warning=FALSE, include=FALSE}
+careers <- subset(careers, careers$CARR_ING_ETA<31 & careers$TIT_CONS_VOTO_FS==100)
+
+```
+
+
+```{r exams, message=FALSE, warning=FALSE, include=FALSE}
+# EXAMS tables
+# Not passed exams aggregated by semester (S), year (Y), and total (T)
+exams_not_passed_aggr <- read.csv(paste0(mydirdi,'exams_not_passed_aggr.csv'))
+# Passed exmaes aggregated as above
+#exams_passed_aggr <- read.csv(paste0(mydirdi,'exams_passed_aggr.csv'))
+exams_passed_aggr <- read.csv(paste0(mydirdi,'exams_passed_aggr_vw.csv'))
+                   
+
+```
+
+
+```{r mobility, echo=FALSE, message=FALSE, warning=FALSE}
+# MOBILITY table (abroad studies)
+mobility <- read.csv(paste0(mydirdi,'SPEET_MOBILITY.csv'))
+# there's no mobility on first years
+no_mobility <- merge(mobility, careers, by.x = c('CARR_AN_ID', 'SI_CNT_AA'), by.y = c('CARR_AN_ID', 'CARR_INGR_AA'))
+
+
+```
+
+## Admission test - partial values
+
+- The admission test if composed on 4 sections:
+  - math
+  - physics
+  - reading comprehension
+  - english
+
+
+- each session has a different score and different importance, we normalized the value by mean
+
+
+```{r tolpar, echo=FALSE, message=FALSE, warning=FALSE}
+#Partial Admission Tests Value 
+tol_ing_norm <- read.csv(paste0(mydirdi,'parziali_ing_norm.csv')) 
+tol_ing_norm <- subset(tol_ing_norm, tol_ing_norm$AMMLP_SESS_AA>=2010)
+tol_ing_norm <- subset( tol_ing_norm, select = c(CARR_AN_ID, CV_NOR_YY, ENG_NOR_YY, FIS_NOR_YY, MAT_NOR_YY ) )
+careers <- merge(careers, tol_ing_norm, by.x = 'CARR_AN_ID', by.y = 'CARR_AN_ID', all.x = TRUE)
+
+# Using apply
+apply(tol_ing_norm[ , -c(1)], 2, function(x) mean(x, na.rm = TRUE))
+
+
+```
+
+## Admission test - Math score
+
+
+```{r tolparmat, echo=FALSE, message=FALSE, warning=FALSE}
+
+p <- tol_ing_norm %>%
+    #group_by(ENG_NOR_YY) %>%
+    #filter(CARR_FLST != 'A')  %>%
+    #filter(STUD_AMM_VOTO >20)  %>%
+    ggplot(aes(x= MAT_NOR_YY ) ) +#, fill=PERS_GENERE )) +
+    geom_histogram(fill = 'cornflowerblue') #trim=FALSE) 
+
+
+p + geom_vline(aes(xintercept=mean(MAT_NOR_YY)),
+            color="blue", linetype="dashed", size=1)
+
+```
+
+## Admission test - Physics score
+
+
+```{r tolparphy, echo=FALSE, message=FALSE, warning=FALSE}
+
+p <- tol_ing_norm %>%
+    ggplot(aes(x= FIS_NOR_YY ) ) +#, fill=PERS_GENERE )) +
+    geom_histogram(fill = 'cornflowerblue') #trim=FALSE) 
+
+
+p + geom_vline(aes(xintercept=mean(FIS_NOR_YY)),
+            color="blue", linetype="dashed", size=1)
+
+```
+
+## Admission test - Reading comprehension score
+
+
+```{r tolparcv, echo=FALSE, message=FALSE, warning=FALSE}
+
+p <- tol_ing_norm %>%
+    ggplot(aes(x= CV_NOR_YY ) ) +#, fill=PERS_GENERE )) +
+    geom_histogram(fill = 'cornflowerblue') #trim=FALSE) 
+
+
+p + geom_vline(aes(xintercept=mean(CV_NOR_YY)),
+            color="blue", linetype="dashed", size=1)
+
+```
+
+
+
+## Admission test - English
+
+
+```{r tolpareng, echo=FALSE, message=FALSE, warning=FALSE}
+
+p <- tol_ing_norm %>%
+    ggplot(aes(x= ENG_NOR_YY ) ) +#, fill=PERS_GENERE )) +
+    geom_histogram(fill = 'cornflowerblue') #trim=FALSE) 
+
+
+p + geom_vline(aes(xintercept=mean(ENG_NOR_YY)),
+            color="blue", linetype="dashed", size=1)
+
+```
+
+
+## Admission test by gender
+
+
+```{r gend, echo=FALSE, message=FALSE, warning=FALSE }
+
+#mu <- ddply(careers, "PERS_GENERE", summarise, grp.adpoint=mean(STUD_AMM_VOTO))
+
+ggplot(careers, aes(x=STUD_AMM_VOTO, color=PERS_GENERE)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity")
+```
+
+
+## Admission test and Previous studies 
+
+```{r admsco, echo=FALSE, message=FALSE, warning=FALSE}
+careers %>%
+     filter(PREVIOUSSTUDIES == 'Scientifica' | PREVIOUSSTUDIES == 'Tecnica' | PREVIOUSSTUDIES == 'Classica' | PREVIOUSSTUDIES == 'Linguistica' ) %>%
+        ggplot(aes(x=STUD_AMM_VOTO, y= TIT_CONS_VOTO , color=TIT_MED_TP_CD_ELAB)) +
+        geom_point(size=2, shape=2)
+```
+
+## Exams
+
+- The information are aggregate by year and only few features remain in the dataset:
+
+  - number of passed exams (CFU)
+  - number of failed exams (CFU)
+  - avarage exams
+
+```{r exxxx, message=FALSE, warning=FALSE, include=FALSE}
+# EXAMS PASSED AGGREGATED TABLE
+# we keep the aggregated information by year
+exams_pass_aggr_year <- subset(exams_passed_aggr, exams_passed_aggr$AGGR_TYPE=='A')
+# we keep just some selected features: CARR_AN_ID, STUD_ATTFRM_FRQ_AA, CFU_FALLIMENTI, CFU_PASSATI, MEDIA_PESATA
+exams_pass_aggr_year_sel <- exams_pass_aggr_year[c( 'CARR_AN_ID', 'STUD_ACQSZ_CFU_AA', 'CFU_FALLIMENTI', 'CFU_PASSATI', 'MEDIA_PESATA')]
+
+
+# EXAMS NOT PASSED AGGREGATED TABLE
+# we keep the aggregated information by year
+exams_not_pass_aggr_year <- subset(exams_not_passed_aggr, exams_not_passed_aggr$AGGR_TYPE=='A')
+# we keep just some selected features: CARR_AN_ID, STUD_ATTFRM_FRQ_AA, CFU_FALLIMENTI
+exams_not_pass_aggr_year_sel <- exams_not_pass_aggr_year[c('CARR_AN_ID', 'STUD_ATTFRM_FRQ_AA', 'CFU_FALLIMENTI')]
+
+# JOIN between exams passed and exams not passed modified tables by CAREER ID and YEAR
+exams_aggr_year_sel <- merge(exams_pass_aggr_year_sel, exams_not_pass_aggr_year_sel, by.x = c('CARR_AN_ID', 'STUD_ACQSZ_CFU_AA'), by.y = c('CARR_AN_ID', 'STUD_ATTFRM_FRQ_AA'), all = TRUE)
+# we substitute 0 (zero) to null values of the features CFU_FALLIMENTI and CFU_PASSATI
+exams_aggr_year_sel$CFU_FALLIMENTI.y[ is.na(exams_aggr_year_sel$CFU_FALLIMENTI.y)] <- 0
+exams_aggr_year_sel$CFU_FALLIMENTI.x[ is.na(exams_aggr_year_sel$CFU_FALLIMENTI.x)] <- 0
+exams_aggr_year_sel$CFU_PASSATI[ is.na(exams_aggr_year_sel$CFU_PASSATI)] <- 0
+# we sum the two features CFU_FALLIMENTI from the JOIN operation into a new variable FAILED_CFU
+exams_aggr_year_sel <- transform(exams_aggr_year_sel, FAILED_CFU=exams_aggr_year_sel$CFU_FALLIMENTI.x+exams_aggr_year_sel$CFU_FALLIMENTI.y)
+# we remove the CFU_FALLIMENTI.x/y features
+drops <- c('CFU_FALLIMENTI.x','CFU_FALLIMENTI.y')
+exams_aggr_year_sel <- exams_aggr_year_sel[ , !(names(exams_aggr_year_sel) %in% drops)]
+
+# JOIN of exams table with the CAREERS table
+dataset <- merge(careers, exams_aggr_year_sel, by.x = c('CARR_AN_ID', 'CARR_INGR_AA'), by.y= c('CARR_AN_ID','STUD_ACQSZ_CFU_AA') , all.x = TRUE )
+```
+
+## Data Cleaning
+
+```{r imgsco, echo=FALSE, fig.height=4, fig.width=5, message=FALSE, warning=FALSE}
+knitr::include_graphics( paste0(getwd(),"/mixedmodel/data_cleaning.JPG"))
+```
+
+
+
+
+
+## Data cleaning - admission score
+
+
+The admission test is multiple choice with zero average (min: 60, max: 100), we remove 7 students with a negative score 
+
+
+```{r stusamm, message=FALSE, warning=FALSE, , echo=FALSE, include=FALSE}
+# remove dataset$STUD_AMM_VOTO<0 (7 negative values)
+dataset <- dataset[ dataset$STUD_AMM_VOTO >0 | is.na(dataset$STUD_AMM_VOTO)  , ]
+
+# 1766 NA. We substitute them with the median value
+summary(dataset$STUD_AMM_VOTO)
+median_missing = median(dataset$STUD_AMM_VOTO, na.rm=TRUE)
+
+dataset  <- mutate(dataset, STUD_AMM_VOTO_REPLACED_MEDIAN  = ifelse(is.na(dataset$STUD_AMM_VOTO), median_missing, dataset$STUD_AMM_VOTO))
+drops <- c("STUD_AMM_VOTO")
+dataset <- dataset[ , !(names(dataset) %in% drops)]
+```
+
+
+
+## Reduce Columns
+
+Only few column were indipendent and significant, so we reduce the dataset for a smaller model
+
+

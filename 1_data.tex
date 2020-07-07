@@ -1,0 +1,351 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  ignorenonframetext,
+]{beamer}
+\usepackage{pgfpages}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+% Prevent slide breaks in the middle of a paragraph
+\widowpenalties 1 10000
+\raggedbottom
+\setbeamertemplate{part page}{
+  \centering
+  \begin{beamercolorbox}[sep=16pt,center]{part title}
+    \usebeamerfont{part title}\insertpart\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{section page}{
+  \centering
+  \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{subsection page}{
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center]{part title}
+    \usebeamerfont{subsection title}\insertsubsection\par
+  \end{beamercolorbox}
+}
+\AtBeginPart{
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \ifbibliography
+  \else
+    \frame{\sectionpage}
+  \fi
+}
+\AtBeginSubsection{
+  \frame{\subsectionpage}
+}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Mixed Model on Polimi Students Data},
+  pdfauthor={Riccardo Bertoglio - Paola Mussida},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\newif\ifbibliography
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Mixed Model on Polimi Students Data}
+\author{Riccardo Bertoglio - Paola Mussida}
+\date{07/07/2020}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{Target}
+\protect\hypertarget{target}{}
+
+\textbf{Apply Multilevel Model on PoliMI data to maximise performance on
+dropout prediction.}
+
+Students are rarely indipendent, they are clustered or nested in a way
+that makes the observations not truly independent.
+
+\end{frame}
+
+\begin{frame}{Agenda}
+\protect\hypertarget{agenda}{}
+
+\begin{enumerate}
+\tightlist
+\item
+  Data Preparation
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Data Exploration
+\item
+  Data Cleaning
+\item
+  Data Aggregation
+\item
+  Feature Selection
+\item
+  Missing Values
+\end{itemize}
+
+\begin{enumerate}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Models
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Data Partition
+\item
+  Model Creation
+\item
+  Results Evaluation
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Careers}
+\protect\hypertarget{careers}{}
+
+\includegraphics{1_data_files/figure-beamer/carrrsee-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Career Description}
+\protect\hypertarget{career-description}{}
+
+\begin{itemize}
+\item
+  personal data
+\item
+  previous studies
+\item
+  admission score
+\item
+  degree course
+\item
+  exams
+\item
+  degree / dropout
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ended careers by course}
+\protect\hypertarget{ended-careers-by-course}{}
+
+\includegraphics{1_data_files/figure-beamer/endcar-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Previous Studies}
+\protect\hypertarget{previous-studies}{}
+
+\includegraphics{1_data_files/figure-beamer/previous-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Foreign Previous Studies}
+\protect\hypertarget{foreign-previous-studies}{}
+
+\includegraphics{1_data_files/figure-beamer/states-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Admission Test - score distribution}
+\protect\hypertarget{admission-test---score-distribution}{}
+
+\includegraphics{1_data_files/figure-beamer/tolall-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Data Cleaning}
+\protect\hypertarget{data-cleaning}{}
+
+\begin{itemize}
+\item
+  We focus only on young students (less than 30 years old) because of
+  data distribution. Older people have different paces and different
+  ways to handle the studies, so they cannot be used to predict
+  majority.
+\item
+  We remove also maximum value for school grade different than 100 means
+  that those people are outlier (for example, 60 as maximum grade was
+  used in the past)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Admission test - partial values}
+\protect\hypertarget{admission-test---partial-values}{}
+
+\begin{itemize}
+\tightlist
+\item
+  The admission test if composed on 4 sections:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    math
+  \item
+    physics
+  \item
+    reading comprehension
+  \item
+    english
+  \end{itemize}
+\item
+  each session has a different score and different importance, we
+  normalized the value by mean
+\end{itemize}
+
+\begin{verbatim}
+##  CV_NOR_YY ENG_NOR_YY FIS_NOR_YY MAT_NOR_YY 
+##  0.7829635  0.8331675  0.5997384  0.7056361
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}{Admission test - Math score}
+\protect\hypertarget{admission-test---math-score}{}
+
+\includegraphics{1_data_files/figure-beamer/tolparmat-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Admission test - Physics score}
+\protect\hypertarget{admission-test---physics-score}{}
+
+\includegraphics{1_data_files/figure-beamer/tolparphy-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Admission test - Reading comprehension score}
+\protect\hypertarget{admission-test---reading-comprehension-score}{}
+
+\includegraphics{1_data_files/figure-beamer/tolparcv-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Admission test - English}
+\protect\hypertarget{admission-test---english}{}
+
+\includegraphics{1_data_files/figure-beamer/tolpareng-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Admission test by gender}
+\protect\hypertarget{admission-test-by-gender}{}
+
+\includegraphics{1_data_files/figure-beamer/gend-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Admission test and Previous studies}
+\protect\hypertarget{admission-test-and-previous-studies}{}
+
+\includegraphics{1_data_files/figure-beamer/admsco-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Exams}
+\protect\hypertarget{exams}{}
+
+\begin{itemize}
+\item
+  The information are aggregate by year and only few features remain in
+  the dataset:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    number of passed exams (CFU)
+  \item
+    number of failed exams (CFU)
+  \item
+    avarage exams
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Data Cleaning}
+\protect\hypertarget{data-cleaning-1}{}
+
+\includegraphics{C:/Users/10114518/Documents/dm/prj-dropout/mixedmodel/mixedmodel/data_cleaning.JPG}
+
+\end{frame}
+
+\begin{frame}{Data cleaning - admission score}
+\protect\hypertarget{data-cleaning---admission-score}{}
+
+The admission test is multiple choice with zero average (min: 60, max:
+100), we remove 7 students with a negative score
+
+\end{frame}
+
+\begin{frame}{Reduce Columns}
+\protect\hypertarget{reduce-columns}{}
+
+Only few column were indipendent and significant, so we reduce the
+dataset for a smaller model
+
+\end{frame}
+
+\end{document}
